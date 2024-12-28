@@ -18,7 +18,7 @@ pipeline {
             steps {
                 // بناء صورة Docker من Dockerfile
                 script {
-                    docker.build("${DOCKER_IMAGE}:v2.1")
+                    docker.build("${DOCKER_IMAGE}:latest")
                 }
             }
         }
