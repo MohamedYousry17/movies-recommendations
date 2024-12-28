@@ -1,0 +1,46 @@
+pipeline {
+    agent any  // يحدد أي جهاز يمكنه تنفيذ هذا الـ pipeline
+
+    environment {
+        DOCKER_CLI_EXPERIMENTAL = 'enabled' // تفعيل الخيارات التجريبية لدعم Docker
+        DOCKER_IMAGE = 'myousry009/movie-recommendation' // اسم الصورة على DockerHub
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                // سحب المشروع من GitHub
+                git 'https://github.com/MohamedYousry17/movies-recommendations.git'
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                // بناء صورة Docker من Dockerfile
+                script {
+                    docker.build("${DOCKER_IMAGE}:v2.1")
+                }
+            }
+        }
+
+        stage('Push to DockerHub') {
+            steps {
+                // تسجيل الدخول إلى DockerHub
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-m') {
+                        docker.image("${DOCKER_IMAGE}:latest").push()
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+
